@@ -1,0 +1,24 @@
+@import "tailwindcss";
+
+/* هاد السطر غايبقى بالصفر ف VS Code، تجاهليه (Ignore it) راه صحيح 100% ف Tailwind v4 */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  html {
+    background-color: white;
+    color: #1a202c;
+  }
+
+  html.dark {
+    background-color: #020617;
+    color: white;
+  }
+
+  body {
+    /* عوضنا apply بـ CSS عادي باش تحيد لك الخط الصفر */
+    transition-property: background-color, color;
+    transition-duration: 500ms;
+    margin: 0;
+    padding: 0;
+  }
+}

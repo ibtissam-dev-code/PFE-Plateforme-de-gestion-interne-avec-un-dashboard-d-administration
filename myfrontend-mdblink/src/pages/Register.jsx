@@ -1,0 +1,237 @@
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react"; 
+import API from "../services/api"; 
+
+function Register() {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [showPass, setShowPass] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    nom: "", // مطابق لحقل Backend (Laravel)
+    email: "",
+    password: "",
+    password_confirmation: ""
+  });
+
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (formData.password !== formData.password_confirmation) {
+      return setError("Passwords do not match!");
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await API.post("/register", {
+        nom: formData.nom,
+        email: formData.email,
+        password: formData.password,
+        password_confirmation: formData.password_confirmation
+      });
+
+      if (response.data.token && response.data.user) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+      }
+
+      navigate("/"); 
+    } catch (err) {
+      console.error("Register Error:", err);
+      setError(err.response?.data?.message || "Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="relative w-screen h-screen overflow-hidden bg-slate-950 select-none flex items-center justify-center">
+
+      {/* 🌌 FULL SCREEN BACKGROUND IMAGE */}
+      <div className="absolute inset-0 overflow-hidden">
+        <img
+          src="/logo3.jpeg" 
+          className="w-full h-full object-cover scale-105 animate-[pulse_8s_ease-in-out_infinite]"
+          alt="Premium Background"
+        />
+        {/* 🌑 DARK OVERLAY */}
+        <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px]"></div>
+      </div>
+
+      {/* 💡 ADVANCED LIGHT EFFECTS */}
+      <div className="absolute w-[500px] h-[500px] bg-cyan-500/15 blur-[120px] rounded-full top-[-50px] left-[-50px] animate-pulse"></div>
+      <div className="absolute w-[500px] h-[500px] bg-blue-600/15 blur-[120px] rounded-full bottom-[-50px] right-[-50px] animate-pulse"></div>
+
+      {/* REGISTER CARD CONTAINER */}
+      <div className="relative z-10 w-full max-w-md p-4 animate-[float_6s_ease-in-out_infinite]">
+
+        {/* 🌟 PREMIUM GLASS CARD */}
+        <div className="bg-cyan-950/15 backdrop-blur-3xl border border-white/20 rounded-3xl p-8 shadow-[0_0_50px_rgba(6,182,212,0.2)] hover:border-cyan-400/40 transition-colors duration-500">
+          
+          {/* 🖼️ MYDBLINK TEXT LOGO IMAGE */}
+          <div className="flex flex-col items-center mb-6">
+            <img 
+              src="/mydblink.png" 
+              alt="MYDBLINK" 
+              className="h-24 w-auto object-contain invert sepia saturate-[5] hue-rotate-[190deg] brightness-100 drop-shadow-[0_0_15px_rgba(59,130,246,0.6)]"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'block';
+              }}
+            />
+            {/* نص احتياطي */}
+            <h1 className="hidden text-4xl font-black text-center text-cyan-300 tracking-tight">
+              MYDBLINK
+            </h1>
+            
+            <p className="text-center text-[10px] text-cyan-300/80 font-black mt-2 uppercase tracking-[0.2em] drop-shadow-sm">
+              Create New Account
+            </p>
+          </div>
+
+          {/* ERROR DISPLAY */}
+          {error && (
+            <div className="bg-rose-500/20 border border-rose-500/30 text-rose-300 px-4 py-3 rounded-xl text-xs font-bold mb-4 text-center animate-[shake_0.3s_ease-in-out]">
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-3.5">
+
+            {/* FIELD: FULL NAME (NOM) */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-cyan-200 uppercase tracking-wider pl-1">Full Name</label>
+              <div className="relative">
+                <User className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400/60" size={18} />
+                <input
+                  type="text"
+                  placeholder="John Doe"
+                  value={formData.nom}
+                  required
+                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                  disabled={loading}
+                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-950/40 border border-white/10 text-white outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all text-sm font-medium disabled:opacity-40 placeholder-slate-500"
+                />
+              </div>
+            </div>
+
+            {/* FIELD: EMAIL */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-cyan-200 uppercase tracking-wider pl-1">Email Address</label>
+              <div className="relative">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400/60" size={18} />
+                <input
+                  type="email"
+                  placeholder="name@company.com"
+                  value={formData.email}
+                  required
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  disabled={loading}
+                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-950/40 border border-white/10 text-white outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all text-sm font-medium disabled:opacity-40 placeholder-slate-500"
+                />
+              </div>
+            </div>
+
+            {/* FIELD: PASSWORD */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-cyan-200 uppercase tracking-wider pl-1">Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400/60" size={18} />
+                <input
+                  type={showPass ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={formData.password}
+                  required
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  disabled={loading}
+                  className="w-full pl-12 pr-12 py-3 rounded-xl bg-slate-950/40 border border-white/10 text-white outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all text-sm font-medium disabled:opacity-40 placeholder-slate-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPass(!showPass)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-400/60 hover:text-cyan-300 transition-colors"
+                >
+                  {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+            </div>
+
+            {/* FIELD: CONFIRM PASSWORD */}
+            <div className="space-y-1">
+              <label className="text-[10px] font-bold text-cyan-200 uppercase tracking-wider pl-1">Confirm Password</label>
+              <div className="relative">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-cyan-400/60" size={18} />
+                <input
+                  type={showPass ? "text" : "password"}
+                  placeholder="••••••••"
+                  value={formData.password_confirmation}
+                  required
+                  onChange={(e) => setFormData({ ...formData, password_confirmation: e.target.value })}
+                  disabled={loading}
+                  className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-950/40 border border-white/10 text-white outline-none focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/10 transition-all text-sm font-medium disabled:opacity-40 placeholder-slate-500"
+                />
+              </div>
+            </div>
+
+            {/* SUBMIT BUTTON */}
+            <button
+              type="submit"
+              disabled={loading}
+              className={`w-full py-3.5 mt-4 rounded-xl font-black text-xs uppercase tracking-wider text-white
+              bg-gradient-to-r from-cyan-500 via-blue-600 to-cyan-500 bg-[length:200%_auto] hover:bg-right
+              shadow-[0_0_30px_rgba(6,182,212,0.3)] hover:shadow-[0_0_40px_rgba(6,182,212,0.5)]
+              transition-all duration-500 flex items-center justify-center gap-2 group
+              ${loading ? 'opacity-50 cursor-not-allowed scale-[0.98]' : 'hover:scale-[1.01]'}`}
+            >
+              {loading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span>Registering Account...</span>
+                </div>
+              ) : (
+                <>
+                  <span>Register Account</span>
+                  <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform duration-200" />
+                </>
+              )}
+            </button>
+
+          </form>
+
+          {/* 🔗 LINK TO LOGIN PAGE */}
+          <p className="text-center text-xs text-slate-300 mt-5 font-medium">
+            Already have an account?{" "}
+            <Link to="/login" className="text-cyan-400 hover:underline font-bold transition-all">
+              Sign In
+            </Link>
+          </p>
+
+        </div>
+      </div>
+
+      {/* CSS ANIMATIONS */}
+      <style>
+        {`
+          @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-12px); }
+            100% { transform: translateY(0px); }
+          }
+          @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-4px); }
+            75% { transform: translateX(4px); }
+          }
+        `}
+      </style>
+
+    </div>
+  );
+}
+
+export default Register;
